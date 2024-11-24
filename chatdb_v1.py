@@ -314,8 +314,72 @@ def generate_query_from_functions(user_functions, dataset_index):
     #             print(example)
     #             counter += 1
 
+elif dataset_index == 3:  # Transaction Dataset
+    # Dataset Columns
+    column_titles = [
+        "transaction_id", "transaction_date", "transaction_time", "transaction_qty", 
+        "store_id", "store_location", "product_id", "unit_price", 
+        "product_category", "product_type", "product_detail"
+    ]
+    
+    # Example values for demonstration
+    transaction_ids = ["T001", "T002", "T003", "T004", "T005"]
+    store_locations = ["New York", "San Francisco", "Chicago", "Los Angeles", "Seattle"]
+    product_categories = ["Electronics", "Groceries", "Apparel", "Toys", "Books"]
+    product_types = ["Smartphones", "Fruits", "Shirts", "Dolls", "Novels"]
+    unit_prices = [10, 15, 25, 40, 50]  # Example price range
+    
+    if menu_option == "1":  # Generate "random" queries
+        counter = 0
+        while counter < 3:
+            # Randomly select an attribute
+            attribute_index = random.randint(0, len(column_titles) - 1)
+            att1 = column_titles[attribute_index]  # Example: "transaction_id", "store_location", etc.
 
-        
+            # Randomly select a function/operator
+            function_index = random.randint(0, len(functions_operators) - 1)
+            func1 = functions_operators[function_index]  # Example: "where", "group by", etc.
+
+            # Generate query based on selected function/operator
+            if func1 == "where":
+                attribute_index = random.randint(0, len(column_titles) - 1)
+                att2 = column_titles[attribute_index]
+
+                if att2 == "transaction_id":
+                    entry = random.choice(transaction_ids)
+                    close = f"= \"{entry}\""
+                elif att2 == "store_location":
+                    entry = random.choice(store_locations)
+                    close = f"= \"{entry}\""
+                elif att2 == "product_category":
+                    entry = random.choice(product_categories)
+                    close = f"= \"{entry}\""
+                elif att2 == "unit_price":
+                    entry = random.randint(5, 100)  # Adjust range based on your dataset
+                    close = f"> {entry}"
+
+                example = f"SELECT {att1} FROM transactions WHERE {att2} {close};"
+
+            elif func1 == "group by":
+                att2 = "product_category"  # Example: Grouping by "product_category"
+                example = f"SELECT {att1} FROM transactions {func1} {att2};"
+
+            elif func1 == "having":
+                attribute_index = random.randint(0, len(column_titles) - 1)
+                att2 = column_titles[attribute_index]
+
+                if att2 == "product_category":
+                    entry = random.choice(product_categories)
+                    close = f"= \"{entry}\""
+                elif att2 == "unit_price":
+                    entry = random.randint(5, 100)  # Adjust range as needed
+                    close = f"> {entry}"
+
+                example = f"SELECT {att1} FROM transactions GROUP BY {att1} HAVING {att2} {close};"
+
+            print(example)
+            counter += 1
+
     # # michael's section
     # # elif dataset_index == 2:
     #     user_reviews_col_titles = ["userId", "bookIndex", "score"]
