@@ -1,14 +1,18 @@
-# import sqlalchemy
-# import pymysql
-# pymysql.install_as_MySQLdb()
-# import pandas as pd
+import sqlalchemy
+import pymysql
+pymysql.install_as_MySQLdb()
+import pandas as pd
+
+# from pymongo import MongoClient
+# client = MongoClient()
+# client
+
+# dsci351 = client.dsci351
 
 import random
 
 # running chatdb
 def chatdb():
-    
-
     # selecting a database
     print("What database system would you like to use?")
     print("   1: MySQL")
@@ -35,15 +39,17 @@ def mysql():
     dataset = input("> ")
     dataset = error_checking(dataset, 1, 3)
 
+    my_conn = sqlalchemy.create_engine('mysql+mysqldb://root:Dsci-351@localhost/final')
+
     if dataset == 1:
         # my_conn = sqlalchemy.create_engine('mysql+mysqldb://root:Dsci-351@localhost/books_of_the_decade')
         my_conn = "test"
-        mysql_query(my_conn, "Books of the Decade", dataset)
+        # mysql_query(my_conn, "Books of the Decade", dataset)
     elif dataset == 2:
-        my_conn = sqlalchemy.create_engine('mysql+mysqldb://root:Dsci-351@localhost/spotify_most_streamed_songs')
+        # my_conn = sqlalchemy.create_engine('mysql+mysqldb://root:Dsci-351@localhost/spotify_most_streamed_songs')
         mysql_query(my_conn, "Spotify: Most Streamed Songs", dataset)
     elif dataset == 3:
-        my_conn = sqlalchemy.create_engine('mysql+mysqldb://root:Dsci-351@localhost/google_merchandise')
+        # my_conn = sqlalchemy.create_engine('mysql+mysqldb://root:Dsci-351@localhost/google_merchandise')
         mysql_query(my_conn, "Google Merchandise", dataset)
         
 def mysql_query(my_conn, dataset, dataset_index):
@@ -135,7 +141,7 @@ def sql_query_generation(menu_option, dataset_index):
                         close = "> " + arg
                     example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + " " + close + ";"
                 
-                print(example)
+                example
                 counter += 1
         elif menu_option == "2": # user selects what functions they want
             user_functions = []
@@ -169,17 +175,128 @@ def sql_query_generation(menu_option, dataset_index):
 
             # TODO: generate statement according to user selections
 
+    # hannah's section
+    # elif dataset_index == 3: # google merchandise
+    #     column_titles = ["id", "brand", "variant", "category", "price_in_usd"]
+    #     brand = ["\"Google\"", "\"Android\"", "\"Youtube\"", "\"#IamRemarkable\""]
+    #     category = ["\"Apparel\"", "\"New\"", "\"Drinkware\"", "\"Campus Collection\"", "\"Clearance\""]
 
-    # elif dataset_index == 2:
-    #     column_titles = ["userId", "bookIndex", "score"]
+    #     if menu_option == "1": # generate "random" queries
+    #         counter = 0
+    #         while counter < 3:
+    #             # pseudo random number generator between 0 and x (amount of attributes)
+    #             attribute = random.randint(0, len(column_titles)-1)
+    #             att1 = column_titles[attribute] # select Book_Name
+    #             # pseudo random number generator between 0 and x (amount of functions in functions list)
+    #             function = random.randint(0, len(functions_operators)-1)
+    #             func1 = functions_operators[function] # select Book_Name where
+    #             if func1 == "where":
+    #                 attribute = random.randint(0, len(column_titles)-1)
+    #                 att2 = column_titles[attribute] # select Book_Name where Author
+    #                 if att2 == "column_titles":
+    #                     entry = random.randint(0, 4)
+    #                     close = "= "
+    #                     close += book_name[entry] # select Book_Name where Book_Name 
+    #                 elif att2 == "brand":
+    #                     entry = random.randint(0, 3)
+    #                     close = "= "
+    #                     close += authors[entry]
+    #                 elif att2 == "category":
+    #                     arg = str(random.randint(0, 4))
+    #                     close = "> " + arg
+    #                 elif att2 == "Number_of_Votes":
+    #                     arg = str(random.randint(2, 2000000))
+    #                     close = "> " + arg
+    #                 elif att2 == "Score":
+    #                     arg = str(random.randint(0, 62442))
+    #                     close = "> " + arg
+    #                 example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + " " + close + ";"
+    #             elif func1 == "group by":
+    #                 att2 = "Author" # select Book_Name where Author
+    #                 example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + ";"
+    #             elif func1 == "having":
+    #                 attribute = random.randint(0, len(column_titles)-1)
+    #                 att2 = column_titles[attribute] # select Book_Name where Author
+    #                 if att2 == "Book_Name":
+    #                     entry = random.randint(0, 4)
+    #                     close = "= "
+    #                     close += book_name[entry] # select Book_Name where Book_Name 
+    #                 elif att2 == "Author":
+    #                     entry = random.randint(0, 4)
+    #                     close = "= "
+    #                     close += authors[entry]
+    #                 elif att2 == "Rating":
+    #                     arg = str(random.randint(0, 4))
+    #                     close = "> " + arg
+    #                 elif att2 == "Number_of_Votes":
+    #                     arg = str(random.randint(50, 2000000))
+    #                     close = "> " + arg
+    #                 elif att2 == "Score":
+    #                     arg = str(random.randint(0, 62442))
+    #                     close = "> " + arg
+    #                 example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + " " + close + ";"
+                
+    #             print(example)
+    #             counter += 1
+
+
         
-    #     entry = random.randin(1, 80000) # userID
-    #     entry = random.randin(1, 2327) # bookindex 
-    #     entry = random.randin(1, 5) # score
-
-
-    # elif dataset_index == 3:
-    
+    # # michael's section
+    # # elif dataset_index == 2:
+    #     user_reviews_col_titles = ["userId", "bookIndex", "score"]
+    #     # entry = random.randin(1, 80000) # userID
+    #     # entry = random.randin(1, 2327) # bookindex 
+    #     # entry = random.randin(1, 5) # score
+    #         if menu_option == "1": # generate "random" queries
+    #         counter = 0
+    #         while counter < 3:
+    #             user_reviews_attr = random.randint(0, len(user_reviews_col_titles)-1)
+    #             att1 = user_reviews_col_titles[user_reviews_attr]
+    #             function = random.randint(0, len(functions_operators)-1)
+    #             func1 = functions_operators[function] 
+    #             if func1 == "where":
+    #                 user_reviews_attr = random.randint(0, len(user_reviews_col_titles)-1)
+    #                 att2 = user_reviews_col_titles[user_reviews_attr] 
+    #                 if att2 == "userID":
+    #                     entry = random.randint(1, 80000)
+    #                     close = "= "
+    #                     close += entry
+    #                 elif att2 == "bookIndex":
+    #                     entry = random.randin(1, 2327)
+    #                     close = "= "
+    #                     close += entry
+    #                 elif att2 == "score":
+    #                     entry = random.randin(1, 5)
+    #                     close = "= "
+    #                     close += entry
+    #                 example = "select " + att1 + " from user_reviews_dataset " + func1 + " " + att2 + " " + close + ";"
+    #             elif func1 == "group by":
+    #                 att2 = "Author" # select Book_Name where Author
+    #                 example = "select " + att1 + " from user_reviews_dataset " + func1 + " " + att2 + ";"
+    #             elif func1 == "having":
+    #                 user_reviews_attr = random.randint(0, len(user_reviews_col_titles)-1)
+    #                 att2 = user_reviews_col_titles[user_reviews_attr] # select Book_Name where Author
+    #                 if att2 == "Book_Name":
+    #                     entry = random.randint(0, 4)
+    #                     close = "= "
+    #                     close += book_name[entry] # select Book_Name where Book_Name 
+    #                 elif att2 == "Author":
+    #                     entry = random.randint(0, 4)
+    #                     close = "= "
+    #                     close += authors[entry]
+    #                 elif att2 == "Rating":
+    #                     arg = str(random.randint(0, 4))
+    #                     close = "> " + arg
+    #                 elif att2 == "Number_of_Votes":
+    #                     arg = str(random.randint(50, 2000000))
+    #                     close = "> " + arg
+    #                 elif att2 == "Score":
+    #                     arg = str(random.randint(0, 62442))
+    #                     close = "> " + arg
+    #                 example = "select " + att1 + " from user_reviews_dataset " + func1 + " " + att2 + " " + close + ";"
+                
+    #             print(example)
+    #             counter += 1
 
    
 
@@ -188,7 +305,7 @@ def mongodb():
     print("Please select a database you would like to explore:")
     print("   1: Yelp Dataset")
     print("   2: Iris Dataset")
-    print("   3: Real Estate Predictions")
+    print("   3: YouTube Trending Dataset")
 
     dataset = input("> ")
     dataset = error_checking(dataset, 1, 3)
