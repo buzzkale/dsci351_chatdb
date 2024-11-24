@@ -192,7 +192,7 @@ def sql_query_generation(menu_option, dataset_index):
     #             func1 = functions_operators[function] # select Book_Name where
     #             if func1 == "where":
     #                 attribute = random.randint(0, len(column_titles)-1)
-    #                 att2 = column_titles[attribute] # select Book_Name where Author
+    #                 att2 = column_titles[attribute] # select name where brand
     #                 if att2 == "column_titles":
     #                     entry = random.randint(0, 4)
     #                     close = "= "
@@ -200,42 +200,27 @@ def sql_query_generation(menu_option, dataset_index):
     #                 elif att2 == "brand":
     #                     entry = random.randint(0, 3)
     #                     close = "= "
-    #                     close += authors[entry]
+    #                     close += brands[entry]
     #                 elif att2 == "category":
     #                     arg = str(random.randint(0, 4))
     #                     close = "> " + arg
-    #                 elif att2 == "Number_of_Votes":
-    #                     arg = str(random.randint(2, 2000000))
-    #                     close = "> " + arg
-    #                 elif att2 == "Score":
-    #                     arg = str(random.randint(0, 62442))
-    #                     close = "> " + arg
-    #                 example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + " " + close + ";"
     #             elif func1 == "group by":
-    #                 att2 = "Author" # select Book_Name where Author
-    #                 example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + ";"
+    #                 att2 = "brand" # select name where brand
+    #                 example = "select " + att1 + " from items " + func1 + " " + att2 + ";"
     #             elif func1 == "having":
     #                 attribute = random.randint(0, len(column_titles)-1)
-    #                 att2 = column_titles[attribute] # select Book_Name where Author
-    #                 if att2 == "Book_Name":
+    #                 att2 = column_titles[attribute] # select name where brand
+    #                 if att2 == "name":
     #                     entry = random.randint(0, 4)
     #                     close = "= "
-    #                     close += book_name[entry] # select Book_Name where Book_Name 
-    #                 elif att2 == "Author":
+    #                     close += name[entry] # select name where brand 
+    #                 elif att2 == "brand":
     #                     entry = random.randint(0, 4)
     #                     close = "= "
-    #                     close += authors[entry]
-    #                 elif att2 == "Rating":
-    #                     arg = str(random.randint(0, 4))
-    #                     close = "> " + arg
-    #                 elif att2 == "Number_of_Votes":
+    #                     close += brand[entry]
+    #                 elif att2 == "price_in_usd":
     #                     arg = str(random.randint(50, 2000000))
-    #                     close = "> " + arg
-    #                 elif att2 == "Score":
-    #                     arg = str(random.randint(0, 62442))
-    #                     close = "> " + arg
-    #                 example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + " " + close + ";"
-                
+    #                     close = "> " + arg       
     #             print(example)
     #             counter += 1
 
