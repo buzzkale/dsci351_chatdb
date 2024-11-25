@@ -15,6 +15,24 @@ import random
 global my_conn
 my_conn = None
 
+
+class sql_database_class:
+    def __init__(self, table_name, columns, num_cols, str_cols):
+        self.table_name = table_name
+        self.columns = columns
+        self.num_cols  = num_cols   #columns with nums
+        self.str_cols = str_cols    #cols with strings
+
+    '''
+    def generate_query(self):
+        select_columns = ", ".join(self.columns)
+        query = f"""
+        SELECT {select_columns}
+        FROM {self.table_name}
+        ORDER BY {self.order_by_column} {self.sort_order};
+        """
+        return query.strip()'''
+
 # running chatdb
 def chatdb(): 
     # selecting a database
@@ -106,144 +124,42 @@ def get_shared_columns():
         # 'customers': 'customer_id'
     }
 
-
 def sql_query_generation(menu_option, dataset_index, my_conn):
     column_titles = []
-    functions_end = ["asc", "desc"]
-    functions_operators = ["where", "group by", "sort by", "having"]
-    functions_number = ["limit", "skip", "offset"]
-    functions = ["asc", "desc", "where", "group by", "sort by", "having", "limit", "skip", "offset"]
+   
+    functions = ["asc", "desc", "where", "group by", "having", "limit", "offset"]
+
+    book_db = sql_database_class("books_of_the_decade", 
+                                columns= ["`Index`" if col.lower() == "index" else col for col in ["Index", "Book_Name", "Author", "Rating", "Number_of_Votes", "Score"]],
+                                num_cols = ["Rating", "Number_of_Votes", "Score"],
+                                str_cols = ["Book_Name", "Author"])
+    
+    spotify_db = sql_database_class("spotify_most_streamed_songs", 
+                                columns= ["track_name",	"artist_name",	"artist_count",	"released_year",	"released_month",	"released_day",	"in_spotify_playlists",	"in_spotify_charts",	"streams",	"in_apple_playlists",	"in_apple_charts",	"in_deezer_playlists",	"in_deezer_charts",	"in_shazam_charts",	"bpm",	"`key`",	"mode",	"danceability_pct",	"valence_pct",	"energy_pct",	"acousticness_pct",	"instrumentalness_pct",	"liveness_pct",	"speechiness_pct",	"cover_url"],
+                                num_cols = ["artist_count", "streams", "in_apple_playlists"],
+                                str_cols = ["artist_name", "released_year", "bpm"])
+
     if dataset_index == 1: # books of the decade
-        column_titles = ["`Index`" if col.lower() == "index" else col for col in ["Index", "Book_Name", "Author", "Rating", "Number_of_Votes", "Score"]]
-        book_names = ["The Invisible Life of Addie LaRue", "Project Hail Mary", "The Midnight Library", "Piranesi", "Lessons in Chemistry"]
-        authors = ["Victoria Schwab", "T.J. Klune", "Andy Weir", "Matt Haig", "Suzanne Collins"]
         if menu_option == "1": # generate "random" queries
-            for _ in range(10):
-                attribute = random.choice(column_titles)
-                function = random.choice(functions_operators)
-                non_agg_columns = ["Book_Name", "Author", "Index"]
-                numeric_columns = ["Rating", "Number_of_Votes", "Score"]
-
-                query = f"SELECT {attribute} FROM books_of_the_decade"
-                
-                if function == "where":
-                    condition_column = random.choice(column_titles)
-                    if condition_column in ["Book_Name", "Author"]:
-                        value = random.choice(book_names if condition_column == "Book_Name" else authors)
-                        query += f" WHERE `{condition_column}` = '{value}'"
-                    else:
-                        operator = random.choice([">", "<", "="])
-                        value = random.randint(1, 5) if condition_column == "Rating" else random.randint(1000, 2000000)
-                        query += f" WHERE `{condition_column}` {operator} {value}"
-                
-                elif function == "group by":
-                    group_column = random.choice(non_agg_columns + numeric_columns)
-                    agg_function = random.choice(["COUNT", "AVG", "MAX", "MIN"])
-                    agg_column = random.choice(numeric_columns)
-                    query = f"SELECT `{group_column}`, {agg_function}({agg_column}) FROM books_of_the_decade GROUP BY `{group_column}`"
-                
-                elif function == "order by":
-                    order_column = random.choice(column_titles)
-                    direction = random.choice(["ASC", "DESC"])
-                    query += f" ORDER BY {order_column} {direction}"
-
-                elif function == "having":
-                    group_column = random.choice(non_agg_columns)
-                    agg_function = random.choice(["COUNT", "AVG", "MAX", "MIN"])
-                    agg_column = random.choice(numeric_columns)
-                    operator = random.choice([">", "<"])
-                    value = random.randint(1, 1000000)
-                    # query = f"SELECT {group_column}, {agg_function}({agg_column}) FROM books_of_the_decade GROUP BY {group_column} HAVING {agg_function}({agg_column}) {operator} {value}"
-                    query = f"SELECT `{group_column}`, {agg_function}({agg_column}) FROM books_of_the_decade GROUP BY `{group_column}` HAVING {agg_function}(`{agg_column}`) {operator} {value}"
-                    # if agg_function == "COUNT":
-                    #     query = f"SELECT {group_column}, COUNT(*) FROM books_of_the_decade GROUP BY {group_column} HAVING COUNT(*) {operator} {value}"
-                    # else:
-                    #     query = f"SELECT {group_column}, {agg_function}({agg_column}) FROM books_of_the_decade GROUP BY {group_column} HAVING {agg_function}({agg_column}) {operator} {value}"
-                elif function == "sort by":
-                    sort_column = random.choice(column_titles)
-                    direction = random.choice(["ASC", "DESC"])
-                    query += f" ORDER BY `{sort_column}` {direction}"
-
-                elif function == "limit":
-                    limit_value = random.choice([1, 5, 10, 50, 100])
-                    query += f" LIMIT {limit_value}"
-            
-                # if function == "sort by":
-                #     sort_column = random.choice(column_titles)
-                #     direction = random.choice(["ASC", "DESC"])
-                #     query += f" ORDER BY `{sort_column}` {direction}"
-                    
-                #     # Add a chance to include LIMIT after ORDER BY
-                #     if random.random() < 0.5:  # 50% chance to add LIMIT
-                #         limit_value = random.choice([1, 5, 10, 50, 100])
-                #         query += f" LIMIT {limit_value}"
-
-                # elif function == "limit":
-                #     limit_value = random.choice([1, 5, 10, 50, 100])
-                #     query += f" LIMIT {limit_value}"
-
-                # # Add a chance to include LIMIT for queries that don't have sort by or limit
-                # if "ORDER BY" not in query and "LIMIT" not in query and random.random() < 0.3:  # 30% chance
-                #     limit_value = random.choice([1, 5, 10, 50, 100])
-                #     query += f" LIMIT {limit_value}"
-                
-            
-                print(f"Ex #{_+1}: {query};")
-                try:
-                    # Execute the query
-                    result = pd.read_sql(query, my_conn)
-                    
-                    # Print the results
-                    if result.empty:
-                        print("Query executed successfully, but returned no results.")
-                    else:
-                        print("\nQuery Results:")
-                        print(result.to_string(index=False))
-                        print(f"\nNumber of rows: {len(data)}")
-                except Exception as e:
-                    print(f"Error executing query: {e}")
-                
-                print("\n" + "-"*50 + "\n")  # Separator between queries
-           
+            query = generate_query_from_functions(book_db, random.randint(0, 6))
         elif menu_option == "2": # user selects what functions they want
-            user_functions = []
-            incompatible_pairs = [
-                {"asc", "desc"},
-                {"limit", "offset"},
-                {"group by", "order by"}
-            ]
-
-            while True:
-                print("Select a function you would like an example of:")
-                for i, func in enumerate(functions, 1):
-                    print(f"{i}: {func}")
-                
-                selection = int(input("> ")) - 1
-                if 0 <= selection < len(functions):
-                    new_function = functions[selection]
-                    
-                    # Check for incompatibility
-                    is_incompatible = False
-                    for pair in incompatible_pairs:
-                        if new_function in pair:
-                            if any(func in user_functions for func in pair):
-                                print(f"Error: '{new_function}' is incompatible with a previously selected function.")
-                                is_incompatible = True
-                                break
-                    
-                    if not is_incompatible:
-                        user_functions.append(new_function)
-                        print(f"Added '{new_function}' to your query.")
-                    
-                    if not yes_no("Would you like to add another function?"):
-                        break
-                else:
-                    print("Invalid selection. Please try again.")
+            print("Select a function you would like an example of:")
+            for i, func in enumerate(functions, 1):
+                print(f"{i}: {func}")
+            selection = int(input("> ")) - 1
             # Generate query based on user_functions
-            query = generate_query_from_functions(user_functions, dataset_index)
-            print("Generated query:", query)
+            query = generate_query_from_functions(book_db, selection)
+            #print("Generated query:", query)
     elif  dataset_index == 2: # "Spotify: Most Streamed Songs"
-        column_titles = ["track_name", "artist(s)_name", "artist_count", "released_year", "released_month", "released_day", "in_spotify_playlists", "in_spotify_charts", "streams", "in_apple_playlists", "in_apple_charts", "in_deezer_playlists", "in_deezer_charts", "in_shazam_charts", "bpm", "key", "mode", "danceability_%", "valence_%", "energy_%", "acousticness_%", "instrumentalness_%", "liveness_%", "speechiness_%", "cover_url"]
+        if menu_option == "1": # generate "random" queries
+            query = generate_query_from_functions(spotify_db, random.randint(0, 6))
+        elif menu_option == "2": 
+            print("Select a function you would like an example of:")
+            for i, func in enumerate(functions, 1):
+                print(f"{i}: {func}")
+            selection = int(input("> ")) - 1
+            # Generate query based on user_functions
+            query = generate_query_from_functions(spotify_db, selection)
         return 
     elif  dataset_index == 3: # "Google Merchandise"
         tables = get_column_titles(dataset_index)
@@ -316,148 +232,45 @@ def sql_query_generation(menu_option, dataset_index, my_conn):
                 except Exception as e:
                     print(f"Error executing query: {e}")
         return 
+  
+def generate_query_from_functions(db, selection):
+    functions = ["asc", "desc", "where", "group by", "having", "limit", "offset"]
 
+    if selection == 0:
+        query = f"SELECT {random.choice(db.str_cols)} FROM {db.table_name} ORDER BY {random.choice(db.num_cols)} ASC;"
+    elif selection == 1:
+        query = f"SELECT {random.choice(db.str_cols)} FROM {db.table_name} ORDER BY {random.choice(db.num_cols)} DESC;"
+    elif selection == 2:
+        query = f"SELECT {random.choice(db.str_cols)} FROM {db.table_name} WHERE {random.choice(db.num_cols)} > {random.randint(1, 5)};"
+    elif selection == 3:
+        col1 = random.choice(db.str_cols)
+        query = f"SELECT {col1}, SUM({random.choice(db.num_cols)}) FROM {db.table_name} GROUP BY {col1};"
+    elif selection == 4:
+        print("having")
+        col1 = random.choice(db.str_cols)
+        col2 = random.choice(db.num_cols)
+        query = f"SELECT {col1}, SUM({col2}) as total FROM {db.table_name} GROUP BY {col1} HAVING total > {random.randint(1, 5)};"
+    elif selection == 5:
+        col1 = random.choice(db.str_cols)
+        query = f"SELECT {col1}, SUM({random.choice(db.num_cols)}) as total FROM {db.table_name} GROUP BY {col1} LIMIT {random.randint(1, 10)};"
+    elif selection == 6:
+        col1 = random.choice(db.str_cols)
+        query = f"SELECT {col1}, SUM({random.choice(db.num_cols)}) as total FROM {db.table_name} GROUP BY {col1} LIMIT {random.randint(6, 10)} OFFSET {random.randint(1, 3)};"
+    
+    print("Example Query:\n", query)
+    execute_query = not yes_no("Do you want to execute the query?")
 
-    
-def generate_query_from_functions(user_functions, dataset_index):
-    # Implement query generation based on selected functions
-    dataset = ""
-    if dataset_index == 1:
-        dataset = "books_of_the_decade"
-    elif dataset_index == 2:
-        dataset = "spotify_most_streamed_songs"
-    elif dataset_index == 3:
-        dataset = "google_merchandise"
-    base_query = "SELECT * FROM " + dataset
-    for func in user_functions:
-        if func == "where":
-            base_query += " WHERE condition" #`column` = value instead of condition?
-        elif func == "group by":
-            base_query += " GROUP BY `column`"
-        elif func == "order by":
-            base_query += " ORDER BY `column`"
-        # Add more conditions for other functions
-    
-    return base_query
-    # hannah's section
-    # elif dataset_index == 3: # google merchandise
-    #     column_titles = ["id", "brand", "variant", "category", "price_in_usd"]
-    #     brand = ["\"Google\"", "\"Android\"", "\"Youtube\"", "\"#IamRemarkable\""]
-    #     category = ["\"Apparel\"", "\"New\"", "\"Drinkware\"", "\"Campus Collection\"", "\"Clearance\""]
-    #     if menu_option == "1": # generate "random" queries
-    #         counter = 0
-    #         while counter < 3:
-    #             # pseudo random number generator between 0 and x (amount of attributes)
-    #             attribute = random.randint(0, len(column_titles)-1)
-    #             att1 = column_titles[attribute] # select Book_Name
-    #             # pseudo random number generator between 0 and x (amount of functions in functions list)
-    #             function = random.randint(0, len(functions_operators)-1)
-    #             func1 = functions_operators[function] # select Book_Name where
-    #             if func1 == "where":
-    #                 attribute = random.randint(0, len(column_titles)-1)
-    #                 att2 = column_titles[attribute] # select Book_Name where Author
-    #                 if att2 == "column_titles":
-    #                     entry = random.randint(0, 4)
-    #                     close = "= "
-    #                     close += book_name[entry] # select Book_Name where Book_Name 
-    #                 elif att2 == "brand":
-    #                     entry = random.randint(0, 3)
-    #                     close = "= "
-    #                     close += authors[entry]
-    #                 elif att2 == "category":
-    #                     arg = str(random.randint(0, 4))
-    #                     close = "> " + arg
-    #                 elif att2 == "Number_of_Votes":
-    #                     arg = str(random.randint(2, 2000000))
-    #                     close = "> " + arg
-    #                 elif att2 == "Score":
-    #                     arg = str(random.randint(0, 62442))
-    #                     close = "> " + arg
-    #                 example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + " " + close + ";"
-    #             elif func1 == "group by":
-    #                 att2 = "Author" # select Book_Name where Author
-    #                 example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + ";"
-    #             elif func1 == "having":
-    #                 attribute = random.randint(0, len(column_titles)-1)
-    #                 att2 = column_titles[attribute] # select Book_Name where Author
-    #                 if att2 == "Book_Name":
-    #                     entry = random.randint(0, 4)
-    #                     close = "= "
-    #                     close += book_name[entry] # select Book_Name where Book_Name 
-    #                 elif att2 == "Author":
-    #                     entry = random.randint(0, 4)
-    #                     close = "= "
-    #                     close += authors[entry]
-    #                 elif att2 == "Rating":
-    #                     arg = str(random.randint(0, 4))
-    #                     close = "> " + arg
-    #                 elif att2 == "Number_of_Votes":
-    #                     arg = str(random.randint(50, 2000000))
-    #                     close = "> " + arg
-    #                 elif att2 == "Score":
-    #                     arg = str(random.randint(0, 62442))
-    #                     close = "> " + arg
-    #                 example = "select " + att1 + " from books_of_the_decade " + func1 + " " + att2 + " " + close + ";"
-                
-    #             print(example)
-    #             counter += 1
-        
-    # # michael's section
-    # # elif dataset_index == 2:
-    #     user_reviews_col_titles = ["userId", "bookIndex", "score"]
-    #     # entry = random.randin(1, 80000) # userID
-    #     # entry = random.randin(1, 2327) # bookindex 
-    #     # entry = random.randin(1, 5) # score
-    #         if menu_option == "1": # generate "random" queries
-    #         counter = 0
-    #         while counter < 3:
-    #             user_reviews_attr = random.randint(0, len(user_reviews_col_titles)-1)
-    #             att1 = user_reviews_col_titles[user_reviews_attr]
-    #             function = random.randint(0, len(functions_operators)-1)
-    #             func1 = functions_operators[function] 
-    #             if func1 == "where":
-    #                 user_reviews_attr = random.randint(0, len(user_reviews_col_titles)-1)
-    #                 att2 = user_reviews_col_titles[user_reviews_attr] 
-    #                 if att2 == "userID":
-    #                     entry = random.randint(1, 80000)
-    #                     close = "= "
-    #                     close += entry
-    #                 elif att2 == "bookIndex":
-    #                     entry = random.randin(1, 2327)
-    #                     close = "= "
-    #                     close += entry
-    #                 elif att2 == "score":
-    #                     entry = random.randin(1, 5)
-    #                     close = "= "
-    #                     close += entry
-    #                 example = "select " + att1 + " from user_reviews_dataset " + func1 + " " + att2 + " " + close + ";"
-    #             elif func1 == "group by":
-    #                 att2 = "Author" # select Book_Name where Author
-    #                 example = "select " + att1 + " from user_reviews_dataset " + func1 + " " + att2 + ";"
-    #             elif func1 == "having":
-    #                 user_reviews_attr = random.randint(0, len(user_reviews_col_titles)-1)
-    #                 att2 = user_reviews_col_titles[user_reviews_attr] # select Book_Name where Author
-    #                 if att2 == "Book_Name":
-    #                     entry = random.randint(0, 4)
-    #                     close = "= "
-    #                     close += book_name[entry] # select Book_Name where Book_Name 
-    #                 elif att2 == "Author":
-    #                     entry = random.randint(0, 4)
-    #                     close = "= "
-    #                     close += authors[entry]
-    #                 elif att2 == "Rating":
-    #                     arg = str(random.randint(0, 4))
-    #                     close = "> " + arg
-    #                 elif att2 == "Number_of_Votes":
-    #                     arg = str(random.randint(50, 2000000))
-    #                     close = "> " + arg
-    #                 elif att2 == "Score":
-    #                     arg = str(random.randint(0, 62442))
-    #                     close = "> " + arg
-    #                 example = "select " + att1 + " from user_reviews_dataset " + func1 + " " + att2 + " " + close + ";"
-                
-    #             print(example)
-    #             counter += 1
+    if execute_query:
+        try:
+            data = pd.read_sql(query, my_conn)
+            if data.empty:
+                print("Query executed successfully, but returned no results.")
+            else:
+                print("\nQuery Results:")
+                print(data.to_string(index=False))
+                print(f"\nNumber of rows: {len(data)}")
+        except Exception as e:
+            print(f"Error executing query: {e}")
    
 def mongodb():
     print("You are now using MongoDB.")
